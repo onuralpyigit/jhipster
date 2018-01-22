@@ -1,0 +1,141 @@
+entity Kapi {
+	en Double,
+    kasa Double,
+    yukseklik Double,
+    miktar Integer,
+    kanatEn String,
+    kanatYukseklik String,
+    mdfEn String,
+    mdfYukseklik String,
+    iskeletEn String,
+    iskeletYukseklik String,
+    fiyat Double,
+    tutar Double
+}
+
+entity KapiBirim {
+	birim String,
+    enable Boolean
+}
+
+entity KapiKanat {
+	kanat String,
+    enable Boolean
+}
+
+entity KapiModel {
+	model String,
+    enable Boolean
+}
+
+entity KapiPervaz {
+	pervaz String,
+    enable Boolean
+}
+
+entity KapiRenk {
+	renk String,
+    enable Boolean
+}
+
+entity KapiUretimKanat {
+	en String,
+    yukseklik String,
+    enable Boolean
+}
+
+entity KapiUretimMdf {
+	en String,
+    yukseklik String,
+    enable Boolean
+}
+
+entity KapiUretimIskelet {
+	en String,
+    yukseklik String,
+    enable Boolean
+}
+
+relationship OneToOne {
+	Kapi{birim} to KapiBirim,
+    Kapi{kanat} to KapiKanat,
+    Kapi{model} to KapiModel,
+    Kapi{pervaz} to KapiPervaz,
+    Kapi{renk} to KapiRenk,
+    Kapi{uretimKanat} to KapiUretimKanat,
+    Kapi{uretimMdf} to KapiUretimMdf,
+    Kapi{uretimIskelet} to KapiUretimIskelet
+}
+
+entity Siparis {
+	fisNo Integer,
+    aciklama String,
+    siparisTarihi ZonedDateTime required,
+    teslimatTarihi ZonedDateTime,
+    siparisDurumu SiparisDurumu required,
+    toplamTutar Double,
+    iskonto Double
+}
+
+enum SiparisDurumu {
+    ONAY_BEKLIYOR,
+    ONAYLANDI,
+    URETIMDE,
+    TESLIMATA_HAZIR,
+    TESLIM_EDILDI
+}
+
+relationship ManyToOne {
+	Kapi{siparis} to Siparis
+}
+
+relationship OneToMany {
+	Siparis{kapilar} to Kapi
+}
+
+entity Musteri {
+	isim String required,
+    unvan String required,
+    adres String,
+    telefon String,
+    eposta String
+}
+
+relationship OneToOne {
+    Siparis{musteri} to Musteri
+}
+
+entity User {
+	username String required,
+    password String required,
+    lastAccessDate ZonedDateTime,
+    name String, 
+    surname String,
+    mail String,
+    role UserRole
+}
+
+enum UserRole {
+    ROLE_ADMIN,
+    ROLE_USER,
+    MUSTERI
+}
+
+entity Component {
+	name String
+}
+
+relationship OneToMany {
+	Component{roler} to UserRole
+}
+
+// Set pagination options
+paginate Siparis, Musteri, User with pagination
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except User, Component
+
+// Set an angular suffix
+angularSuffix * with mySuffix
